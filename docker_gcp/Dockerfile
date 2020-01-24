@@ -4,7 +4,7 @@ RUN mkdir /home/data
 
 COPY UploadBlob.py /home/data
 COPY requirements.txt /home/data
-COPY /home/pi/secretgc.json /home/data
+COPY secretgc.json /home/data
 
 WORKDIR /home/data
 
