@@ -8,6 +8,6 @@ COPY secretgc.json /home/data
 
 WORKDIR /home/data
 
-RUN pip install -r ./requirements.txt
+RUN pip install -r requirements.txt
 
-CMD ["python", "./UploadBlob.py"]
+CMD ["python", "UploadBlob.py"]
