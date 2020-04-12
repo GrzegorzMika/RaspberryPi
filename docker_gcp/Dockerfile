@@ -1,4 +1,4 @@
-FROM arm32v7/python:3.6-buster
+FROM python:3.6
 
 RUN mkdir /home/data
 
