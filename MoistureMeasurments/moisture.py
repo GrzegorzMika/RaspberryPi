@@ -1,41 +1,40 @@
 #!/usr/bin/env python
-
 import time
+from datetime import datetime
+import logging
 
 from grove.grove_moisture_sensor import GroveMoistureSensor
-from grove.display.jhd1802 import JHD1802
+
+logging.basicConfig(filename='./log.log', level=logging.WARNING,
+                    format='%(asctime)s %(levelname)s %(name)s %(message)s')
+logger = logging.getLogger(__name__)
 
 
 def main():
-    # Grove - 16x2 LCD(White on Blue) connected to I2C port
-    lcd = JHD1802()
-
-    # Grove - Moisture Sensor connected to port A0
+    period = 60
+    wait = 59.99/period
     sensor = GroveMoistureSensor(0)
 
-    lcd.home()
-    lcd.write("LCD model:".format(lcd.name))
-    lcd.setCursor(1, 0)
-    lcd.write("{}".format(lcd.name))
-    time.sleep(5)
-    lcd.clear()
+    with open('moisture_2.txt', 'w+') as f:
+        f.write('Timestamp, Moisture\n')
 
     while True:
-        mois = sensor.moisture
-        if 0 <= mois < 300:
-            level = 'dry'
-        elif 300 <= mois < 600:
-            level = 'moist'
-        else:
-            level = 'wet'
-
-        for i in range(16):
-            lcd.setCursor(0, 0)
-            lcd.write('moisture: {0:>6}'.format(mois))
-            lcd.setCursor(1, i)
-            lcd.write('{}'.format(level))
-            time.sleep(1)
-            lcd.clear()
+        moisture_temporary = []
+        for _ in range(period):
+            try:
+                moisture_temporary.append(sensor.moisture)
+            except Exception as e:
+                logging.error(e)
+            finally:
+                time.sleep(wait)
+        moisture = sum(moisture_temporary) / len(moisture_temporary)
+        now = datetime.now()
+        with open('moisture_2.txt', 'a+') as f:
+            try:
+                # print('Measurement: {}'.format(moisture))
+                f.write('{}, {}\n'.format(now.strftime("%Y-%m-%d %H:%M:%S"), moisture))
+            except Exception as e:
+                logging.error(e)
 
 
 if __name__ == '__main__':
